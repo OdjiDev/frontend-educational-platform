@@ -13,8 +13,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) 
   },
 
-  // 3. Route sécurisée pour le Tableau de bord Admin
-  //{ 
+  // Route sécurisée pour le Tableau de bord Admin
+  // { 
   //   path: 'admin-dashboard', 
   //   loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
   //   canActivate: [adminGuard] // Protégé par ton Guard validé
