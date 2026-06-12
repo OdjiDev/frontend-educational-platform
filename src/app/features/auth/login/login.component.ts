@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { studentGuard } from '../../../core/guards/student.guard';
 
 @Component({
   selector: 'app-login',
@@ -47,7 +48,9 @@ export class LoginComponent {
             if (user.role === 'admin') {
               this.router.navigate(['/admin-dashboard']);
             } else {
-              this.router.navigate(['/student-courses']);
+
+              this.router.navigate(['../courses']);
+               console.log("doit afficher les cours")
             }
           },
           error: () => {

@@ -10,6 +10,8 @@ export const studentGuard: CanActivateFn = () => {
   return authService.getUserProfile().pipe(
     map(user => {
       if (user && user.role === 'student') {
+
+               console.log("le role etudiant est activé")
         return true; //  Autorisé
       }
       router.navigate(['/auth/login']);
