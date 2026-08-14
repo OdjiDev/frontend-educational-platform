@@ -8,7 +8,18 @@
   "projects": {
     "frontend-educational-platform": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "type": "Component",
+          "flat": false,
+          "skipSelector": false,
+          "skipTests": false,
+          "style": "css",
+          "changeDetection": "Eager",
+          "viewEncapsulation": "Emulated",
+          "prefix": "app"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",

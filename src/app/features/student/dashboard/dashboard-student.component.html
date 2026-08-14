@@ -1,0 +1,86 @@
+<!-- features/student/dashboard/dashboard-student.component.html -->
+<div class="dashboard-container">
+  <!-- En-tête -->
+  <div class="dashboard-header">
+    <div>
+      <h1>🎓 Tableau de bord</h1>
+      <p class="welcome">Bonjour, {{ student()?.prenom }} {{ student()?.nom }}</p>
+    </div>
+    <div class="student-info">
+      <span class="badge">{{ student()?.niveau }}</span>
+      <span class="badge">{{ student()?.filiere }}</span>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ activeCoursesCount() }}</span>
+        <span class="stat-label">Cours en cours</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ resultsSummary()?.exams_passes || 0 }}</span>
+        <span class="stat-label">Examens passés</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ resultsSummary()?.moyenne_generale || 0 }}/20</span>
+        <span class="stat-label">Moyenne générale</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ resultsSummary()?.progression || 0 }}%</span>
+        <span class="stat-label">Progression</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progression -->
+  <div class="progress-section">
+    <h2>Progression globale</h2>
+    <div class="progress-bar-container">
+      <div class="progress-bar" [style.width.%]="resultsSummary()?.progression || 0">
+        {{ resultsSummary()?.progression || 0 }}%
+      </div>
+    </div>
+    <div class="progress-details">
+      <span>{{ resultsSummary()?.credits_obtenus || 0 }} / {{ resultsSummary()?.credits_total || 180 }} crédits</span>
+    </div>
+  </div>
+
+  <!-- Cours récents -->
+  <div class="courses-section">
+    <div class="section-header">
+      <h2>📖 Cours récents</h2>
+      <a [routerLink]="['/student/courses']" class="view-all">Voir tout →</a>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loader">Chargement...</div>
+    } @else {
+      <div class="course-grid">
+        @for (course of recentCourses(); track course.id) {
+          <div class="course-card">
+            <h3>{{ course.title }}</h3>
+            <p>{{ course.description }}</p>
+            <div class="course-footer">
+              <span class="teacher">{{ course.teacher_name }}</span>
+              <a [routerLink]="['/student/courses', course.id]" class="btn-view">Voir</a>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty">Aucun cours pour le moment.</p>
+        }
+      </div>
+    }
+  </div>
+</div>

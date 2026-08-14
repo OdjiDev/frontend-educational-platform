@@ -1,0 +1,189 @@
+<!-- src/app/features/student/course-detail/course-detail-student.component.html -->
+@if (isLoading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement du chapitre...</p>
+  </div>
+} @else {
+  @if (chapter(); as chapter) {
+    <div class="chapter-detail-container">
+      <!-- En-tête -->
+      <div class="chapter-header" [style.border-left-color]="chapter.color">
+        <button class="btn-back" (click)="goBack()">← Retour</button>
+        <div class="header-content">
+          <div class="header-icon" [style.background-color]="chapter.color + '33'">
+            {{ chapter.icon }}
+          </div>
+          <div class="header-info">
+            <h1>{{ chapter.title }}</h1>
+            <p>{{ chapter.description }}</p>
+            <div class="header-meta">
+              <span>{{ chapter.totalLessons }} leçons</span>
+              <span>•</span>
+              <span>{{ chapter.completedLessons }} complétées</span>
+              <span>•</span>
+              <span class="progress-badge" [style.color]="chapter.isCompleted ? '#10b981' : '#f59e0b'">
+                {{ chapter.isCompleted ? '✅ Terminé' : getProgressPercentage() + '%' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barre de progression -->
+      <div class="progress-section">
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="getProgressPercentage()" [style.background-color]="chapter.color">
+            <span>{{ getProgressPercentage() }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onglets -->
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab() === 'cours'" (click)="setTab('cours')">
+          📖 Cours
+        </button>
+        <button class="tab" [class.active]="activeTab() === 'exercices'" (click)="setTab('exercices')">
+          ✏️ Exercices ({{ exerciceLessons().length }})
+        </button>
+        <button class="tab" [class.active]="activeTab() === 'ressources'" (click)="setTab('ressources')">
+          📎 Ressources ({{ resourceLessons().length }})
+        </button>
+        @if (chapter.examens && chapter.examens.length > 0) {
+          <button class="tab" [class.active]="activeTab() === 'examens'" (click)="setTab('examens')">
+            📝 Examens ({{ chapter.examens.length }})
+          </button>
+        }
+      </div>
+
+      <!-- Contenu des onglets -->
+      <div class="tab-content">
+        <!-- Cours -->
+        @if (activeTab() === 'cours') {
+          <div class="lesson-list">
+            @for (lesson of coursLessons(); track lesson.id) {
+              <div class="lesson-item" (click)="toggleLessonCompletion(lesson)">
+                <div class="lesson-check">
+                  <span class="checkbox" [class.checked]="lesson.isCompleted">
+                    {{ lesson.isCompleted ? '✅' : '⬜' }}
+                  </span>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-title">{{ lesson.title }}</span>
+                  <span class="lesson-duration">⏱️ {{ lesson.duration }}</span>
+                </div>
+                <div class="lesson-action">
+                  @if (lesson.isCompleted) {
+                    <span class="badge-completed">Complété</span>
+                  } @else {
+                    <button class="btn-start">Commencer</button>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-text">Aucun cours disponible pour ce chapitre.</p>
+            }
+          </div>
+        }
+
+        <!-- Exercices -->
+        @if (activeTab() === 'exercices') {
+          <div class="lesson-list">
+            @for (lesson of exerciceLessons(); track lesson.id) {
+              <div class="lesson-item" (click)="toggleLessonCompletion(lesson)">
+                <div class="lesson-check">
+                  <span class="checkbox" [class.checked]="lesson.isCompleted">
+                    {{ lesson.isCompleted ? '✅' : '⬜' }}
+                  </span>
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-title">{{ lesson.title }}</span>
+                  <span class="lesson-duration">⏱️ {{ lesson.duration }}</span>
+                </div>
+                <div class="lesson-action">
+                  @if (lesson.isCompleted) {
+                    <span class="badge-completed">Complété</span>
+                  } @else {
+                    <button class="btn-start">Commencer</button>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-text">Aucun exercice disponible pour ce chapitre.</p>
+            }
+          </div>
+        }
+
+        <!-- Ressources -->
+        @if (activeTab() === 'ressources') {
+          <div class="lesson-list">
+            @for (lesson of resourceLessons(); track lesson.id) {
+              <div class="lesson-item">
+                <div class="lesson-check">
+                  @if (lesson.type === 'video') {
+                    <span class="icon">🎬</span>
+                  } @else {
+                    <span class="icon">📄</span>
+                  }
+                </div>
+                <div class="lesson-info">
+                  <span class="lesson-title">{{ lesson.title }}</span>
+                  <span class="lesson-duration">
+                    📅 {{ lesson.uploadedAt || 'Date inconnue' }}
+                  </span>
+                  @if (lesson.fileSize) {
+                    <span class="file-size">{{ formatFileSize(lesson.fileSize) }}</span>
+                  }
+                </div>
+                <div class="lesson-action">
+                  @if (isDownloading(lesson.id)) {
+                    <div class="download-progress">
+                      <div class="progress-bar-mini">
+                        <div class="progress-fill" [style.width.%]="getDownloadProgress(lesson.id)"></div>
+                      </div>
+                      <span>{{ getDownloadProgress(lesson.id) }}%</span>
+                    </div>
+                  } @else {
+                    <button class="btn-download" (click)="downloadFile(lesson)">
+                      📥 Télécharger
+                    </button>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-text">Aucune ressource disponible pour ce chapitre.</p>
+            }
+          </div>
+        }
+
+        <!-- Examens -->
+        @if (activeTab() === 'examens') {
+          <div class="exam-list">
+            @for (exam of chapter.examens; track exam.id) {
+              <div class="exam-item">
+                <div class="exam-info">
+                  <span class="exam-title">{{ exam.title }}</span>
+                  <div class="exam-meta">
+                    <span>📅 {{ exam.date }}</span>
+                    <span>⏱️ {{ exam.duration }} min</span>
+                    <span>🎯 {{ exam.totalPoints }} pts</span>
+                  </div>
+                </div>
+                <div class="exam-action">
+                  @if (exam.isCompleted) {
+                    <span class="badge-completed">✅ Note: {{ exam.score }}/{{ exam.totalPoints }}</span>
+                  } @else {
+                    <button class="btn-start-exam">📝 Démarrer l'examen</button>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-text">Aucun examen disponible pour ce chapitre.</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+}

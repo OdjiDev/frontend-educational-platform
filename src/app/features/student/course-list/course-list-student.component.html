@@ -1,0 +1,86 @@
+<!-- src/app/features/student/course-list/course-list-student.component.html -->
+<div class="course-list-container">
+  <!-- ============================================================ -->
+  <!-- EN-TÊTE -->
+  <!-- ============================================================ -->
+  <div class="header">
+    <div>
+      <h1>📚 Programme de Mathématiques</h1>
+      <p class="subtitle">Terminale Sciences Exactes (TSE) – {{ totalChapters() }} chapitres</p>
+    </div>
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="🔍 Rechercher un chapitre..."
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STATISTIQUES DE PROGRESSION -->
+  <!-- ============================================================ -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-number">{{ completedChapters() }}</span>
+      <span class="stat-label">sur {{ totalChapters() }} chapitres</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ completedLessons() }}</span>
+      <span class="stat-label">leçons complétées</span>
+    </div>
+    <div class="stat-item stat-progress">
+      <span class="stat-number">{{ globalProgress() }}%</span>
+      <span class="stat-label">progression globale</span>
+    </div>
+  </div>
+
+  <!-- Barre de progression globale -->
+  <div class="global-progress">
+    <div class="progress-bar-container">
+      <div class="progress-bar" [style.width.%]="globalProgress()">
+        <span class="progress-text">{{ globalProgress() }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- LISTE DES CHAPITRES -->
+  <!-- ============================================================ -->
+  <div class="chapters-grid">
+    @for (chapter of filteredChapters(); track chapter.id) {
+      <div class="chapter-card" [style.border-left-color]="chapter.color">
+        <div class="chapter-icon" [style.background-color]="chapter.color + '33'">
+          {{ chapter.icon }}
+        </div>
+        <div class="chapter-content">
+          <div class="chapter-header">
+            <h3>{{ chapter.title }}</h3>
+            <span class="chapter-badge" [style.background-color]="chapter.isCompleted ? '#10b981' : '#f59e0b'">
+              {{ chapter.isCompleted ? '✅ Terminé' : 'En cours' }}
+            </span>
+          </div>
+          <p class="chapter-description">{{ chapter.description }}</p>
+          <div class="chapter-footer">
+            <div class="chapter-progress">
+              <div class="mini-progress-bar">
+                <div class="mini-progress-fill" [style.width.%]="chapter.progress" [style.background-color]="chapter.color"></div>
+              </div>
+              <span class="progress-label">{{ chapter.completedLessons }}/{{ chapter.totalLessons }} leçons</span>
+            </div>
+            <a [routerLink]="['/student/courses', chapter.id]" class="btn-view">
+              Voir le chapitre →
+            </a>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>Aucun chapitre trouvé</h3>
+        <p>Aucun résultat pour "{{ searchTerm() }}"</p>
+      </div>
+    }
+  </div>
+</div>

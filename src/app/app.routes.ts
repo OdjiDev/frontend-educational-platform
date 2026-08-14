@@ -1,33 +1,52 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { adminGuard } from './core/guards/admin-guard';
-import { studentGuard } from './core/guards/student.guard';
-import { from } from 'rxjs';
-import {Courses} from './features/student/courses/courses';
+// import { authGuard } from './core/guards/auth.guard';
+// import { roleGuard } from './core/guards/role.guard';
+
 export const routes: Routes = [
-  // 1. Redirection automatique si on arrive sur la racine http://localhost:4200
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-
-  // 2. Route du Login en Lazy Loading (Chargement à la demande)
-  {
-    path: 'login',
-    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
-  },
-
-  // Route sécurisée pour le Tableau de bord Admin
+  // ============================================================
+  // ROUTES PUBLIQUES (Authentification)
+  // ============================================================
   // {
-  //   path: 'admin-dashboard',
-  //   loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-  //   canActivate: [adminGuard] // Protégé par ton Guard validé
+  //   path: 'auth',
+  //   loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
   // },
 
-  // // 4. Route sécurisée pour l'Espace Étudiant
+  // ============================================================
+  // ROUTES PROTÉGÉES (Layout principal)
+  // ============================================================
   {
-    path: 'courses',
-    loadComponent: () => import('./features/student/courses/courses').then(m => m.Courses),
-    canActivate: [studentGuard] // Protégé par ton Guard validé
+    path: '',
+    //canActivate: [authGuard],
+    children: [
+      // ---------- ESPACE ÉTUDIANT ----------
+      {
+        path: 'student',
+        //canActivate: [roleGuard(['admin', 'teacher', 'student'])],
+        loadChildren: () => import('./features/student/student.routes').then(m => m.studentRoutes)
+      },
+
+      // ---------- ESPACE ENSEIGNANT ----------
+      // {
+      //   path: 'teacher',
+      //   canActivate: [roleGuard(['admin', 'teacher'])],
+      //   loadChildren: () => import('./features/teacher/teacher.routes').then(m => m.teacherRoutes)
+      // },
+
+      // ---------- ESPACE ADMIN ----------
+      // {
+      //   path: 'admin',
+      //   canActivate: [roleGuard(['admin'])],
+      //   loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
+      // },
+
+      // ---------- REDIRECTION PAR DÉFAUT ----------
+      { path: '', redirectTo: '/student/dashboard', pathMatch: 'full' }
+    ]
   },
 
-  // 5. Redirection de secours si l'utilisateur tape une URL qui n'existe pas
-  { path: '**', redirectTo: 'login' }
+  // ============================================================
+  // ROUTE 404
+  // ============================================================
+  { path: '**', redirectTo: '/auth/login' }
 ];
